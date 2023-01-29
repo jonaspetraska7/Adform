@@ -5,11 +5,11 @@ namespace Common.Interfaces
     public interface IPointService
     {
         /// <summary>
-        /// Method for inserting a pointlist to the database
+        /// Method for inserting a list of points as a pointlist to the database
         /// </summary>
-        /// <param name="point">A pointlist object to insert</param>
+        /// <param name="points">A list of points to form a pointlist and insert to the database</param>
         /// <returns>A status</returns>
-        Task<int> InsertPointList(PointList point);
+        Task<Guid> InsertPointList(List<Point> points);
 
         /// <summary>
         /// Method for getting a pointlist from the database
@@ -17,13 +17,6 @@ namespace Common.Interfaces
         /// <param name="id">ID of the pointlist to get</param>
         /// <returns>A Pointlist object or null</returns>
         Task<PointList?> GetPointList(Guid? id);
-
-        /// <summary>
-        /// Method for deleting a pointlist from the database
-        /// </summary>
-        /// <param name="id">ID of the pointlist to delete</param>
-        /// <returns>A status</returns>
-        Task<int> DeletePointList(Guid id);
 
         /// <summary>
         /// Method for updating a pointlist in the database
@@ -53,6 +46,6 @@ namespace Common.Interfaces
         /// </summary>
         /// <param name="pointListId">ID of the pointlist to get the squares from</param>
         /// <returns>A list of a list of points</returns>
-        Task<List<List<Point>>> GetSquares(Guid pointListId);
+        Task<List<Square>> GetSquares(Guid pointListId);
     }
 }

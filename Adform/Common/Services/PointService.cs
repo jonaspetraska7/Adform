@@ -8,28 +8,36 @@ namespace Common.Services
     public class PointService : IPointService
     {
         private readonly AdformDataConnection _connection;
-        public PointService(AdformDataConnection connection)
+        private readonly ISquareService _squareService;
+
+        public PointService(AdformDataConnection connection, ISquareService squareService)
         {
             _connection = connection;
-        }
-        public Task<int> InsertPointList(PointList point)
-        {
-            return _connection.InsertAsync(point);
+            _squareService = squareService;
         }
 
-        public Task<PointList?> GetPointList(Guid? id)
+        public async Task<Guid> InsertPointList(List<Point> points)
         {
-            return _connection.PointLists.SingleOrDefaultAsync(x => x.Id == id);
+            var pointList = new PointList() { Points = points };
+
+            var result = await _connection.InsertAsync((PointListDto) pointList);
+
+            if(result != -1)
+            {
+                return pointList.Id;
+            }
+
+            return Guid.Empty;
         }
 
-        public Task<int> DeletePointList(Guid id)
+        public async Task<PointList?> GetPointList(Guid? id)
         {
-            return _connection.PointLists.Where(x => x.Id == id).DeleteAsync();
+            return (PointList?) await _connection.PointLists.SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public Task<int> UpdatePointList(PointList pointList)
         {
-            return _connection.UpdateAsync(pointList);
+            return _connection.UpdateAsync((PointListDto) pointList);
         }
 
         public async Task<int> InsertPoint(Point point, Guid pointListId)
@@ -67,7 +75,7 @@ namespace Common.Services
             return -1;
         }
 
-        public async Task<List<List<Point>>> GetSquares(Guid pointListId)
+        public async Task<List<Square>> GetSquares(Guid pointListId)
         {
             var pointList = await GetPointList(pointListId);
 
@@ -79,7 +87,7 @@ namespace Common.Services
                 }
                 else
                 {
-                    // Logic to calculate squares
+                    _squareService.UpdatePointListSquares(pointList);
 
                     await UpdatePointList(pointList);
 
@@ -87,11 +95,7 @@ namespace Common.Services
                 }
             }
 
-            return new List<List<Point>>();
+            return new List<Square>();
         }
-
-
-
-
     }
 }

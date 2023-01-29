@@ -10,7 +10,7 @@ namespace Common.Data
         public AdformDataConnection(LinqToDBConnectionOptions<AdformDataConnection> options)
             : base(options) { }
 
-        public ITable<PointList> PointLists => this.GetTable<PointList>();
+        public ITable<PointListDto> PointLists => this.GetTable<PointListDto>();
 
     }
 }

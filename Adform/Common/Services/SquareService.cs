@@ -7,7 +7,20 @@ namespace Common.Services
     {
         public PointList UpdatePointListSquares(PointList pointList)
         {
-            List<Square> squares = GetSquares(pointList.Points);
+            var result = GetSquares(pointList.Points);
+
+            var squares = new List<List<Point>>();
+            var squareSet = new HashSet<string>();
+
+            foreach (var square in result)
+            {
+                var s = square.ToString();
+                if (!squareSet.Contains(s))
+                {
+                    squares.Add(square.Points);
+                    squareSet.Add(s);
+                }
+            }
 
             pointList.Squares = squares;
             pointList.SquaresCached = true;
@@ -15,39 +28,53 @@ namespace Common.Services
             return pointList;
         }
 
-        public List<Square> GetSquares(List<Point> points)
+        public List<Square> GetSquares(List<Point> input)
         {
             List<Square> squares = new List<Square>();
+            HashSet<string> hashSet = input.Select(p => p.ToString()).ToHashSet();
 
-            foreach (Point point1 in points)
+            for (int i = 0; i < input.Count; i++)
             {
-                foreach (Point point2 in points)
+                for (int j = 0; j < input.Count; j++)
                 {
-                    if (point1.X == point2.X && point1.Y == point2.Y)
+                    if (input[i].Equals(input[j])) continue;
+
+                    //For each Point i, Point j, check if b&d exist in set.
+                    var DiagVertex = GetRestPoints(input[i], input[j]);
+                    if (DiagVertex != null && hashSet.Contains(DiagVertex[0].ToString()) && hashSet.Contains(DiagVertex[1].ToString()))
                     {
-                        continue;
-                    }
-
-                    int deltaX = point2.X - point1.X;
-                    int deltaY = point2.Y - point1.Y;
-                    int distance = deltaX * deltaX + deltaY * deltaY;
-
-                    Point point3 = new Point(point2.X + deltaY, point2.Y - deltaX);
-                    Point point4 = new Point(point3.X + deltaX, point3.Y + deltaY);
-
-                    if (points.Contains(point3) && points.Contains(point4))
-                    {
-                        Point point5 = new Point(point1.X + deltaY, point1.Y - deltaX);
-                        if (points.Contains(point5))
-                        {
-                            squares.Add(new Square(point1, point2, point3, point4));
-                        }
+                        squares.Add(new Square(input[i], DiagVertex[0], input[j], DiagVertex[1]));
                     }
                 }
             }
 
             return squares;
         }
+
+        private List<Point>? GetRestPoints(Point a, Point c)
+        {
+            // find mid point of point a and c
+            var midX = (float)(a.X + c.X) / 2;
+            var midY = (float)(a.Y + c.Y) / 2;
+
+            // calculate point b
+            var Ax = a.X - midX;
+            var Ay = a.Y - midY;
+            var bX = midX - Ay;
+            var bY = midY + Ax;
+
+            // calculate point d
+            var cX = (c.X - midX);
+            var cY = (c.Y - midY);
+            var dX = midX - cY;
+            var dY = midY + cX;
+
+            return IsInteger(bX) && IsInteger(bY) && IsInteger(dX) && IsInteger(dY)
+                ? new List<Point> { new Point { X = (int)bX, Y = (int)bY }, new Point { X = (int)dX, Y = (int)dY } }
+                : null;
+        }
+
+        private bool IsInteger(float p) => p - (int)p == 0;
 
     }
 }

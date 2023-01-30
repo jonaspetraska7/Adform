@@ -8,5 +8,7 @@
         {
             Points = new List<Point> { p1, p2, p3, p4 };
         }
+
+        public override string ToString() => string.Join(",", Points.OrderBy(p => p.X).ThenBy(p => p.Y));
     }
 }

@@ -6,7 +6,7 @@ namespace Common.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public List<Point> Points { get; set; } = new List<Point>();
-        public List<Square> Squares { get; set; } = new List<Square>();
+        public List<List<Point>> Squares { get; set; } = new List<List<Point>>();
         public bool SquaresCached { get; set; } = false;
 
         public PointList() { }
@@ -15,7 +15,7 @@ namespace Common.Entities
         {
             Id = dto.Id;
             Points = JsonSerializer.Deserialize<List<Point>>(dto.Points) ?? new List<Point>();
-            Squares = JsonSerializer.Deserialize<List<Square>>(dto.Squares) ?? new List<Square>();
+            Squares = JsonSerializer.Deserialize<List<List<Point>>>(dto.Squares) ?? new List<List<Point>>();
             SquaresCached = dto.SquaresCached;
         }
 

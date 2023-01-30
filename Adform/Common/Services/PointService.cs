@@ -19,7 +19,6 @@ namespace Common.Services
         public async Task<Guid> InsertPointList(List<Point> points)
         {
             var pointList = new PointList() { Points = points };
-
             var result = await _connection.InsertAsync((PointListDto) pointList);
 
             if(result != -1)
@@ -44,15 +43,16 @@ namespace Common.Services
         {
             var pointList = await GetPointList(pointListId);
 
-            if (pointList != null)
+            if (pointList == null)
             {
-                if (!pointList.Points.Contains(point))
-                {
-                    pointList.Points.Add(point);
-                    pointList.SquaresCached = false;
+                return -1;
+            }
 
-                    return await UpdatePointList(pointList);
-                }
+            if (!pointList.Points.Contains(point))
+            {
+                pointList.Points.Add(point);
+                pointList.SquaresCached = false;
+                return await UpdatePointList(pointList);
             }
 
             return -1;
@@ -62,40 +62,38 @@ namespace Common.Services
         {
             var pointList = await GetPointList(pointListId);
 
-            if (pointList != null)
+            if (pointList == null)
             {
-                if (pointList.Points.Remove(point))
-                {
-                    pointList.SquaresCached = false;
+                return -1;
+            }
 
-                    return await UpdatePointList(pointList);
-                }
+            if (pointList.Points.Remove(point))
+            {
+                pointList.SquaresCached = false;
+                return await UpdatePointList(pointList);
             }
 
             return -1;
         }
 
-        public async Task<List<Square>> GetSquares(Guid pointListId)
+        public async Task<List<List<Point>>> GetSquares(Guid pointListId)
         {
             var pointList = await GetPointList(pointListId);
 
-            if (pointList != null)
+            if (pointList == null)
             {
-                if (pointList.SquaresCached)
-                {
-                    return pointList.Squares;
-                }
-                else
-                {
-                    _squareService.UpdatePointListSquares(pointList);
-
-                    await UpdatePointList(pointList);
-
-                    return pointList.Squares;
-                }
+                return new List<List<Point>>();
             }
 
-            return new List<Square>();
+            if (pointList.SquaresCached)
+            {
+                return pointList.Squares;
+            }
+
+            _squareService.UpdatePointListSquares(pointList);
+            await UpdatePointList(pointList);
+
+            return pointList.Squares;
         }
     }
 }

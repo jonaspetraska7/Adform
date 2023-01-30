@@ -46,6 +46,6 @@ namespace Common.Interfaces
         /// </summary>
         /// <param name="pointListId">ID of the pointlist to get the squares from</param>
         /// <returns>A list of a list of points</returns>
-        Task<List<Square>> GetSquares(Guid pointListId);
+        Task<List<List<Point>>> GetSquares(Guid pointListId);
     }
 }

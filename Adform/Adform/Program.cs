@@ -21,9 +21,14 @@ builder.Services.AddLinqToDBContext<AdformDataConnection>((provider, options) =>
     .UseSqlServer(builder.Configuration.GetConnectionString("AdformDb"))
     .UseDefaultLogging(provider);
 });
+
 builder.Services.AddScoped<ISquareService, SquareService>();
 builder.Services.AddScoped<IPointService, PointService>();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.KeepAliveTimeout = TimeSpan.FromSeconds(5);
+});
 
 var app = builder.Build();
 

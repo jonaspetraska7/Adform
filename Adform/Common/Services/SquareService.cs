@@ -5,9 +5,9 @@ namespace Common.Services
 {
     public class SquareService : ISquareService
     {
-        public PointList UpdatePointListSquares(PointList pointList)
+        public PointList UpdatePointListSquares(PointList pointList, CancellationToken cancellationToken)
         {
-            var result = GetSquares(pointList.Points);
+            var result = GetSquares(pointList.Points, cancellationToken);
 
             var squares = new List<List<Point>>();
             var squareSet = new HashSet<string>();
@@ -28,7 +28,7 @@ namespace Common.Services
             return pointList;
         }
 
-        public List<Square> GetSquares(List<Point> input)
+        public List<Square> GetSquares(List<Point> input, CancellationToken cancellationToken)
         {
             List<Square> squares = new List<Square>();
             HashSet<string> hashSet = input.Select(p => p.ToString()).ToHashSet();
@@ -37,6 +37,8 @@ namespace Common.Services
             {
                 for (int j = 0; j < input.Count; j++)
                 {
+                    if (cancellationToken.IsCancellationRequested) cancellationToken.ThrowIfCancellationRequested();
+
                     if (input[i].Equals(input[j])) continue;
 
                     //For each Point i, Point j, check if b&d exist in set.

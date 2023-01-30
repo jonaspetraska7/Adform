@@ -16,10 +16,10 @@ namespace Common.Services
             _squareService = squareService;
         }
 
-        public async Task<Guid> InsertPointList(List<Point> points)
+        public async Task<Guid> InsertPointList(List<Point> points, CancellationToken cancellationToken = default)
         {
             var pointList = new PointList() { Points = points };
-            var result = await _connection.InsertAsync((PointListDto) pointList);
+            var result = await _connection.InsertAsync((PointListDto) pointList, token: cancellationToken);
 
             if(result != -1)
             {
@@ -29,19 +29,19 @@ namespace Common.Services
             return Guid.Empty;
         }
 
-        public async Task<PointList?> GetPointList(Guid? id)
+        public async Task<PointList?> GetPointList(Guid? id, CancellationToken cancellationToken = default)
         {
-            return (PointList?) await _connection.PointLists.SingleOrDefaultAsync(x => x.Id == id);
+            return (PointList?) await _connection.PointLists.SingleOrDefaultAsync(x => x.Id == id, token: cancellationToken);
         }
 
-        public Task<int> UpdatePointList(PointList pointList)
+        public Task<int> UpdatePointList(PointList pointList, CancellationToken cancellationToken)
         {
-            return _connection.UpdateAsync((PointListDto) pointList);
+            return _connection.UpdateAsync((PointListDto) pointList, token : cancellationToken);
         }
 
-        public async Task<int> InsertPoint(Point point, Guid pointListId)
+        public async Task<int> InsertPoint(Point point, Guid pointListId, CancellationToken cancellationToken = default)
         {
-            var pointList = await GetPointList(pointListId);
+            var pointList = await GetPointList(pointListId, cancellationToken);
 
             if (pointList == null)
             {
@@ -52,15 +52,16 @@ namespace Common.Services
             {
                 pointList.Points.Add(point);
                 pointList.SquaresCached = false;
-                return await UpdatePointList(pointList);
+
+                return await UpdatePointList(pointList, cancellationToken);
             }
 
             return -1;
         }
 
-        public async Task<int> DeletePoint(Point point, Guid pointListId)
+        public async Task<int> DeletePoint(Point point, Guid pointListId, CancellationToken cancellationToken = default)
         {
-            var pointList = await GetPointList(pointListId);
+            var pointList = await GetPointList(pointListId, cancellationToken);
 
             if (pointList == null)
             {
@@ -70,15 +71,16 @@ namespace Common.Services
             if (pointList.Points.Remove(point))
             {
                 pointList.SquaresCached = false;
-                return await UpdatePointList(pointList);
+
+                return await UpdatePointList(pointList, cancellationToken);
             }
 
             return -1;
         }
 
-        public async Task<List<List<Point>>> GetSquares(Guid pointListId)
+        public async Task<List<List<Point>>> GetSquares(Guid pointListId, CancellationToken cancellationToken = default)
         {
-            var pointList = await GetPointList(pointListId);
+            var pointList = await GetPointList(pointListId, cancellationToken);
 
             if (pointList == null)
             {
@@ -90,8 +92,8 @@ namespace Common.Services
                 return pointList.Squares;
             }
 
-            _squareService.UpdatePointListSquares(pointList);
-            await UpdatePointList(pointList);
+            _squareService.UpdatePointListSquares(pointList, cancellationToken);
+            await UpdatePointList(pointList, cancellationToken);
 
             return pointList.Squares;
         }

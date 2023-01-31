@@ -31,7 +31,7 @@ namespace Common.Entities
             return result;
         }
 
-        public static explicit operator PointList(PointListDto dto) => new PointList(dto);
+        public static explicit operator PointList?(PointListDto dto) => dto == null ? null : new PointList(dto);
         public static explicit operator PointListDto(PointList pointList) => pointList.ToDto();
     }
 }

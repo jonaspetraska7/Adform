@@ -9,21 +9,21 @@ namespace Common.Interfaces
         /// </summary>
         /// <param name="points">A list of points to form a pointlist and insert to the database</param>
         /// <returns>A status</returns>
-        Task<Guid> InsertPointList(List<Point> points, CancellationToken cancellationToken);
+        Task<Guid> InsertPointList(List<Point> points, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Method for getting a pointlist from the database
         /// </summary>
         /// <param name="id">ID of the pointlist to get</param>
         /// <returns>A Pointlist object or null</returns>
-        Task<PointList?> GetPointList(Guid? id, CancellationToken cancellationToken);
+        Task<PointList?> GetPointList(Guid? id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Method for updating a pointlist in the database
         /// </summary>
         /// <param name="pointList">Pointlist to update</param>
         /// <returns>A status</returns>
-        public Task<int> UpdatePointList(PointList pointList, CancellationToken cancellationToken);
+        Task<int> UpdatePointList(PointList pointList, CancellationToken cancellationToken= default);
 
         /// <summary>
         /// Method for inserting a point to a pointlist
@@ -31,7 +31,7 @@ namespace Common.Interfaces
         /// <param name="point">Point object to insert</param>
         /// <param name="pointListId">ID of the pointlist to add the point to</param>
         /// <returns>A status</returns>
-        Task<int> InsertPoint(Point point, Guid pointListId, CancellationToken cancellationToken);
+        Task<int> InsertPoint(Point point, Guid pointListId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Method for deleting a point from a pointlist
@@ -39,13 +39,13 @@ namespace Common.Interfaces
         /// <param name="point">Point object to delete</param>
         /// <param name="pointListId">ID of the pointlist to delete the point from</param>
         /// <returns>A status</returns>
-        Task<int> DeletePoint(Point point, Guid pointListId, CancellationToken cancellationToken);
+        Task<int> DeletePoint(Point point, Guid pointListId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Method for getting a list of squares (Each square is a list of points)
         /// </summary>
         /// <param name="pointListId">ID of the pointlist to get the squares from</param>
         /// <returns>A list of a list of points</returns>
-        Task<List<List<Point>>> GetSquares(Guid pointListId, CancellationToken cancellationToken);
+        Task<List<List<Point>>> GetSquares(Guid pointListId, CancellationToken cancellationToken = default);
     }
 }

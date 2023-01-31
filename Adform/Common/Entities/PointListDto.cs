@@ -1,5 +1,4 @@
 ﻿using LinqToDB.Mapping;
-using System.Text.Json;
 
 namespace Common.Entities
 {
@@ -7,8 +6,12 @@ namespace Common.Entities
     {
         [PrimaryKey]
         public Guid Id { get; set; } = Guid.NewGuid();
+
+        [Column(DataType = LinqToDB.DataType.Text)]
         public string Points { get; set; } = "[{}]";
-        public string Squares { get; set; } = "[{}]";
+
+        [Column(DataType = LinqToDB.DataType.Text)]
+        public string Squares { get; set; } = "[[{}]]";
         public bool SquaresCached { get; set; } = false;
 
     }

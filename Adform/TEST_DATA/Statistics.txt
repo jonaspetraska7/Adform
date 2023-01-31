@@ -1,0 +1,20 @@
+All import / add / delete :
+
+~ 1 sec. due to fast Linq2db ORM and small number of db operations.
+
+GetSquares : 
+
+0.5K_Squares_1K_Points : 
+
+Pasted to URL in browser : ~ 1 sec.
+Swagger : ~ 5 sec.
+
+1K_Squares_4K_Points : 
+
+Pasted to URL in browser : ~ 3 sec.
+Swagger : ~ 18 sec.
+
+2K_Squares_8K_Points : (fails. 5 sec. response rule)
+
+Pasted to URL in browser : ~ 9 sec.
+Swagger : ~ 48 sec.

@@ -8,6 +8,7 @@ namespace Adform.Controllers
     [Route("[controller]")]
     public class PointsController : ControllerBase
     {
+        private const bool USE_TIMEOUT = true; // Opt-In to 5 sec rule
         private const int REQUEST_TIMEOUT = 5000; // 5 seconds request limit
         private readonly IPointService _pointService;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -29,7 +30,7 @@ namespace Adform.Controllers
 
             try
             {
-                var id = await _pointService.InsertPointList(points, _cancellationTokenSource.Token);
+                var id = await _pointService.InsertPointList(points, USE_TIMEOUT ? _cancellationTokenSource.Token : default);
                 return Ok(id);
             }
             catch (OperationCanceledException)
@@ -49,7 +50,7 @@ namespace Adform.Controllers
 
             try
             {
-                var status = await _pointService.InsertPoint(point, pointListId, _cancellationTokenSource.Token);
+                var status = await _pointService.InsertPoint(point, pointListId, USE_TIMEOUT ? _cancellationTokenSource.Token : default);
                 return Ok(status);
             }
             catch (OperationCanceledException)
@@ -69,7 +70,7 @@ namespace Adform.Controllers
 
             try
             {
-                var status = await _pointService.DeletePoint(point, pointListId, _cancellationTokenSource.Token);
+                var status = await _pointService.DeletePoint(point, pointListId, USE_TIMEOUT ? _cancellationTokenSource.Token : default);
                 return Ok(status);
             }
             catch (OperationCanceledException)
@@ -89,7 +90,7 @@ namespace Adform.Controllers
 
             try
             {
-                var squares = await _pointService.GetSquares(pointListId, _cancellationTokenSource.Token);
+                var squares = await _pointService.GetSquares(pointListId, USE_TIMEOUT ? _cancellationTokenSource.Token : default);
                 return Ok(squares);
             }
             catch (OperationCanceledException)

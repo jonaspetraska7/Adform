@@ -9,7 +9,7 @@ namespace Common.Interfaces
         /// </summary>
         /// <param name="pointList">A pointlist to calculate squares for</param>
         /// <returns>Pointlist with updated squares property</returns>
-        PointList UpdatePointListSquares(PointList pointList, CancellationToken cancellationToken);
+        PointList UpdatePointListSquares(PointList pointList, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Source : ChatGPT
@@ -22,8 +22,9 @@ namespace Common.Interfaces
         /// If a square is found, it is added to the list of squares. 
         /// This solution has a time complexity of O(n^2) where n is the number of points.
         /// </summary>
-        /// <param name="points">A list of points</param>
+        /// <param name="process"></param>
+        /// <param name="processSize"></param>
         /// <returns>A list of squares</returns>
-        public List<Square> GetSquares(List<Point> points, CancellationToken cancellationToken);
+        List<Square> GetSquares(int process, int processSize, CancellationToken cancellationToken = default);
     }
 }

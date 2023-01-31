@@ -5,20 +5,34 @@ namespace Common.Services
 {
     public class SquareService : ISquareService
     {
-        public PointList UpdatePointListSquares(PointList pointList, CancellationToken cancellationToken)
+        private const int _processSize = 500;
+        private HashSet<string> _pointsSet;
+        private List<Point> _points;
+
+        public PointList UpdatePointListSquares(PointList pointList, CancellationToken cancellationToken = default)
         {
-            var result = GetSquares(pointList.Points, cancellationToken);
+            _points = pointList.Points;
+            _pointsSet = _points.Select(p => p.ToString()).ToHashSet();
+
+            //process points in parallel with a set of 500
+            int processes = (_points.Count / _processSize) + 1;
+
+            var resultSet = new List<IEnumerable<Square>>();
+            Parallel.For(0, processes, process => resultSet.Add(GetSquares(process, _processSize)));
 
             var squares = new List<List<Point>>();
             var squareSet = new HashSet<string>();
 
-            foreach (var square in result)
+            foreach (var result in resultSet)
             {
-                var s = square.ToString();
-                if (!squareSet.Contains(s))
+                foreach (var square in result)
                 {
-                    squares.Add(square.Points);
-                    squareSet.Add(s);
+                    var s = square.ToString();
+                    if (!squareSet.Contains(s))
+                    {
+                        squares.Add(square.Points);
+                        squareSet.Add(s);
+                    }
                 }
             }
 
@@ -28,28 +42,29 @@ namespace Common.Services
             return pointList;
         }
 
-        public List<Square> GetSquares(List<Point> input, CancellationToken cancellationToken)
+        public List<Square> GetSquares(int process, int processSize, CancellationToken cancellationToken = default)
         {
-            List<Square> squares = new List<Square>();
-            HashSet<string> hashSet = input.Select(p => p.ToString()).ToHashSet();
+            var squares = new List<Square>();
 
-            for (int i = 0; i < input.Count; i++)
+            var startIndex = process * processSize;
+            var endIndex = startIndex + processSize > _points.Count ? _points.Count : startIndex + processSize;
+            
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int j = 0; j < input.Count; j++)
+                for (int j = 0; j < _points.Count; j++)
                 {
                     if (cancellationToken.IsCancellationRequested) cancellationToken.ThrowIfCancellationRequested();
+                    
+                    if (_points[i].Equals(_points[j])) continue;
 
-                    if (input[i].Equals(input[j])) continue;
-
-                    //For each Point i, Point j, check if b&d exist in set.
-                    var DiagVertex = GetRestPoints(input[i], input[j]);
-                    if (DiagVertex != null && hashSet.Contains(DiagVertex[0].ToString()) && hashSet.Contains(DiagVertex[1].ToString()))
+                    var diagVertex = GetRestPoints(_points[i], _points[j]);
+                    if (diagVertex != null && _pointsSet.Contains(diagVertex[0].ToString())
+                        && _pointsSet.Contains(diagVertex[1].ToString()))
                     {
-                        squares.Add(new Square(input[i], DiagVertex[0], input[j], DiagVertex[1]));
+                        squares.Add(new Square(_points[i], diagVertex[0], _points[j], diagVertex[1]));
                     }
                 }
             }
-
             return squares;
         }
 

@@ -13,6 +13,48 @@ Create an API that enables the consumer to find out what and how many squares ca
 
 ### Example of a list of points that make up a square:
 ```[(-1;1), (1;1), (1;-1), (-1;-1)]```
+
+# Decisions made / Performace considerations
+### Linq2db 
+* Using Linq2db lightweight ORM instead of Entity framework  for more performant DB operations 
+* Not storing individual point values (no sense to introduce lots of queries)
+* Points are stored in a Text MSSQL data type, capable of handling up to 2GB of point imports
+* Once the squares are calculated the value is cached in the database, secondary queries will be instant
+* (PLAN TODO) : Add a new method for calculating squares just for the newly added point (so you won't need to recalculate all squares when only one point is added)
+
+### Common
+* All bussiness and persistance layer logic moved to a Common class library, so that the solution is not tied to the implementing project (Could make a Winforms/MVC or any other type of app, not only API if needed)
+
+### Timeouts
+* Due to a requirement that a request should take no longer than 5 seconds, imposed a hard limit on a request
+* Introduced cancelation tokens for async operations and also incorporated cancelation token to a square calculation synchronous method
+
+### Square calculation algorithm
+* After searching for a solution, found an O(n^2) solution, which also uses multithreaded approach to split up computing time.
+* Improved the solution compute time safety (useful for lambda computing time) by introducing cancelation token, so that when given too complex task, it would not compute for too long (5sec max Opt-in/Opt-out)
+
+### Performance statistics
+* Test data located in TEST_DATA folder. 
+
+    All import / add / delete :
+    
+    around 1 sec. due to fast Linq2db ORM and small number of db operations.
+    
+    0.5K_Squares_1K_Points : 
+    
+    Pasted to URL in browser : ~ 1 sec.
+    Swagger : ~ 5 sec.
+    
+    1K_Squares_4K_Points : 
+    
+    Pasted to URL in browser : ~ 3 sec.
+    Swagger : ~ 18 sec.
+    
+    2K_Squares_8K_Points : (fails. 5 sec. response rule)
+    
+    Pasted to URL in browser : ~ 9 sec.
+    Swagger : ~ 48 sec.
+
 # API Usage
 ### /Points/Import
 * Takes in a list of point objects ```   {
